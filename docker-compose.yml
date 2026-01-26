@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  ml-app:
+    build: .
+    image: python:3.9-slim
+    volumes:
+      - .:/app
+    working_dir: /app
+    entrypoint: >
+      sh -c "pip install -r requirements.txt && python app.py"
+    ports:
+      - "5000:5000" # UI Port
+      - "8000:8000" # Metrics Port
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
