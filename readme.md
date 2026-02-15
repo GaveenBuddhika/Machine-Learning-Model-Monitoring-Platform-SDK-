@@ -41,7 +41,7 @@ The following directory structure is **mandatory** to ensure:
             └── datasources/
                 ├── datasource.yaml
                
-
+```
 ------------------------------------------------------------------------
 
 # 2. Dockerfile (Application Container Layer)
@@ -83,7 +83,7 @@ CMD ["python", "app.py"]
 
 ------------------------------------------------------------------------
 
-# 🛠 3. Model Migration Guide (Loan Model -> other model)
+# 3. Model Migration Guide (Loan Model -> other model)
 
 When switching to a new model, update **three key layers**.
 
@@ -224,7 +224,7 @@ The monitoring system groups metrics into four quadrants:
 
 # Professional Modification Guidelines
 
-## ➤ Adding New Features (Example: Age)
+##  Adding New Features (Example: Age)
 
 1.  Add column in `model_setup.py`
 2.  Regenerate baseline CSV
@@ -233,7 +233,7 @@ The monitoring system groups metrics into four quadrants:
 
 ------------------------------------------------------------------------
 
-## ➤ Threshold Management (Grafana)
+## Threshold Management (Grafana)
 
 Inside `dashboard.json`:
 
@@ -243,7 +243,7 @@ Inside `dashboard.json`:
 
 ------------------------------------------------------------------------
 
-## ➤ Simulation Testing
+## Simulation Testing
 
 ### Trigger Drift Alert
 
