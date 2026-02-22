@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: 'ML Observability Dashboards'
+    orgId: 1
+    folder: 'ML Observerability - v2'           # folder name in grafana UI
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards

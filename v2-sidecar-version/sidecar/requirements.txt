@@ -1,0 +1,6 @@
+flask
+prometheus_client
+pandas
+scipy
+werkzeug
+psutil

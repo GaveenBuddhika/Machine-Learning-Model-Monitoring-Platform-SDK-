@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 5s # Adjusted to 5 seconds for more frequent monitoring during development
+
+scrape_configs:
+  - job_name: 'ml-sidecar-monitor'
+    static_configs:
+      - targets: ['sidecar-monitor:8000']
+
+  - job_name: 'ml-app'
+    static_configs:
+      - targets: ['loan-app:5000'] 

@@ -1,0 +1,2 @@
+# This directory will contain baseline CSV data
+# Run model_setup.py to generate baseline_data.csv

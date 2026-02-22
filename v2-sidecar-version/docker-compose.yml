@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  #  ML Application
+  loan-app:
+    build: ./app
+    container_name: loan-app
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./models:/app/models  # Shared volume for the trained model
+    depends_on:
+      - sidecar-monitor
+    networks:
+      - ml-obs-network
+
+  #  Universal Monitoring Sidecar 
+  sidecar-monitor:
+    build: ./sidecar
+    container_name: sidecar-monitor
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data      # Shared volume for baseline CSVs
+    environment:
+      - BASELINE_PATH=data/baseline_data.csv
+    networks:
+      - ml-obs-network
+
+  # Prometheus (Metrics Collector)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - sidecar-monitor
+    networks:
+      - ml-obs-network
+
+  # Grafana (Dashboard)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    depends_on:
+      - prometheus
+    networks:
+      - ml-obs-network
+
+  welcome-screen:
+      image: busybox
+      depends_on:
+        - loan-app
+        - sidecar-monitor
+        - prometheus
+        - grafana
+      command: >
+        sh -c "sleep 8; 
+        echo ' ';
+        echo '==================================================';
+        print 'ALL SERVICES ARE ONLINE';
+        echo '==================================================';
+        echo 'Application UI:      http://localhost:5000';
+        echo 'Sidecar Metrics: http://localhost:8000/metrics';
+        echo 'Prometheus UI:   http://localhost:9090';
+        echo 'Grafana Dash:    http://localhost:3000';
+        echo '==================================================';
+        echo ' ' "
+      networks:
+        - ml-obs-network
+
+networks:
+  ml-obs-network:
+    driver: bridge

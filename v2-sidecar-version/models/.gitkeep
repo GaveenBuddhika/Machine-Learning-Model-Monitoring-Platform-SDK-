@@ -1,0 +1,2 @@
+# This directory will contain trained model files (.joblib)
+# Run model_setup.py to generate loan_model.joblib

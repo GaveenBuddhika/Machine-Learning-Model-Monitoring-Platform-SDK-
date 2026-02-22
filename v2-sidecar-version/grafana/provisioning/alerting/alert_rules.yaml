@@ -1,0 +1,197 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: 'ML_Sidecar_Alerts'
+    folder: 'Model Monitoring'
+    interval: 10s
+    rules:
+      - uid: 'drift_alert_001'
+        title: 'High Data Drift Detected'
+        condition: 'C'
+        data:
+          - refId: 'A'
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: 'prometheus-ds'
+            model:
+              expr: 'model_drift_score'
+              refId: 'A'
+          - refId: 'B'
+            datasourceUid: '__expr__'
+            model:
+              type: 'reduce'
+              refId: 'B'
+              expression: 'A'
+              reducer: 'last'
+          - refId: 'C'
+            datasourceUid: '__expr__'
+            model:
+              type: 'threshold'
+              refId: 'C'
+              expression: 'B'
+              conditions:
+                - evaluator:
+                    type: 'gt'
+                    params: [0.7]
+                  operator:
+                    type: 'and'
+                  reducer:
+                    type: 'last'
+        annotations:
+          summary: 'Critical Data Drift in Sidecar'
+          description: 'The Drift score has increased to {{ $values.B.Value }}. Please check the Baseline.'
+        for: 30s
+        labels:
+          severity: 'critical'
+
+      - uid: 'drift_alert_002'
+        title: 'Moderate Data Drift Warning'
+        condition: 'C'
+        data:
+          - refId: 'A'
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: 'prometheus-ds'
+            model:
+              expr: 'model_drift_score'
+              refId: 'A'
+          - refId: 'B'
+            datasourceUid: '__expr__'
+            model:
+              type: 'reduce'
+              refId: 'B'
+              expression: 'A'
+              reducer: 'last'
+          - refId: 'C'
+            datasourceUid: '__expr__'
+            model:
+              type: 'threshold'
+              refId: 'C'
+              expression: 'B'
+              conditions:
+                - evaluator:
+                    type: 'gt'
+                    params: [0.5]
+                  operator:
+                    type: 'and'
+                  reducer:
+                    type: 'last'
+        annotations:
+          summary: 'Data Drift Warning in Sidecar'
+          description: 'The Drift score is {{ $values.B.Value }}. Consider reviewing baseline data.'
+        for: 1m
+        labels:
+          severity: 'warning'
+
+      - uid: 'f1_alert_001'
+        title: 'Model Performance Drop'
+        condition: 'C'
+        data:
+          - refId: 'A'
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: 'prometheus-ds'
+            model:
+              expr: 'model_f1_score'
+              refId: 'A'
+          - refId: 'B'
+            datasourceUid: '__expr__'
+            model:
+              type: 'reduce'
+              refId: 'B'
+              expression: 'A'
+              reducer: 'last'
+          - refId: 'C'
+            datasourceUid: '__expr__'
+            model:
+              type: 'threshold'
+              refId: 'C'
+              expression: 'B'
+              conditions:
+                - evaluator:
+                    type: 'lt'
+                    params: [0.6]
+                  operator:
+                    type: 'and'
+                  reducer:
+                    type: 'last'
+        annotations:
+          summary: 'Low F1-Score in Sidecar'
+          description: 'The model F1-Score has dropped to {{ $values.B.Value }}.'
+        for: 1m
+        labels:
+          severity: 'warning'
+
+      - uid: 'app_down_001'
+        title: 'ML Application Down'
+        condition: 'C'
+        data:
+          - refId: 'A'
+            relativeTimeRange: { from: 60, to: 0 }
+            datasourceUid: 'prometheus-ds'
+            model:
+              expr: 'up{job="ml-app"}'
+              refId: 'A'
+          - refId: 'B'
+            datasourceUid: '__expr__'
+            model:
+              type: 'reduce'
+              refId: 'B'
+              expression: 'A'
+              reducer: 'last'
+          - refId: 'C'
+            datasourceUid: '__expr__'
+            model:
+              type: 'threshold'
+              refId: 'C'
+              expression: 'B'
+              conditions:
+                - evaluator:
+                    type: 'lt'
+                    params: [1]
+                  operator:
+                    type: 'and'
+                  reducer:
+                    type: 'last'
+        annotations:
+          summary: 'ML Application is Down'
+          description: 'The ML application has been unreachable for more than 30 seconds.'
+        for: 30s
+        labels:
+          severity: 'critical'
+
+      - uid: 'sidecar_down_001'
+        title: 'Sidecar Engine Down'
+        condition: 'C'
+        data:
+          - refId: 'A'
+            relativeTimeRange: { from: 60, to: 0 }
+            datasourceUid: 'prometheus-ds'
+            model:
+              expr: 'up{job="ml-sidecar-monitor"}'
+              refId: 'A'
+          - refId: 'B'
+            datasourceUid: '__expr__'
+            model:
+              type: 'reduce'
+              refId: 'B'
+              expression: 'A'
+              reducer: 'last'
+          - refId: 'C'
+            datasourceUid: '__expr__'
+            model:
+              type: 'threshold'
+              refId: 'C'
+              expression: 'B'
+              conditions:
+                - evaluator:
+                    type: 'lt'
+                    params: [1]
+                  operator:
+                    type: 'and'
+                  reducer:
+                    type: 'last'
+        annotations:
+          summary: 'Sidecar Engine is Down'
+          description: 'The sidecar monitoring engine has been unreachable for more than 30 seconds.'
+        for: 30s
+        labels:
+          severity: 'critical'
