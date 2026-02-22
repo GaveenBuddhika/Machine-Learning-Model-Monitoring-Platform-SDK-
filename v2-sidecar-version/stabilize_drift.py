@@ -22,7 +22,7 @@ def stabilize_system(iterations=20):
         except Exception as e:
             print(f"Error: {e}")
         
-        # තත්පරයක විවේකයක් ගනිමු (Grafana එකට දත්ත update වෙන්න වෙලාව දෙන්න)
+        
         time.sleep(1)
 
     print("\n✅ System Stabilized! Now check Grafana for a low K-S Score.")
